@@ -76,19 +76,6 @@
         }
         .lever-wrapper {
             position: relative;
-            touch-action: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        .lever-stack,
-        .lever-wrapper,
-        #lever-ball,
-        #lever-rod {
-            -webkit-tap-highlight-color: transparent;
-        }
-        #lever-ball {
-            touch-action: none;
-            pointer-events: none;
         }
         #lever-rod {
             transition: none;
@@ -255,7 +242,49 @@
             stroke-linejoin: round;
             opacity: 0.94;
         }
-        
+
+        #result-overlay {
+            padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom)) 18px;
+        }
+        #result-stage {
+            width: 100%;
+            max-width: 520px;
+            min-height: min(100dvh - 36px, 100vh - 36px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin: 0 auto;
+        }
+        #result-header {
+            margin-bottom: 0 !important;
+        }
+        #result-card-container {
+            width: clamp(190px, 24vw, 260px);
+            height: clamp(285px, 43vh, 390px);
+            max-width: 78vw;
+            max-height: 52dvh;
+            margin: 0 auto;
+        }
+        #result-actions {
+            margin-top: 0 !important;
+            gap: 14px !important;
+        }
+        #result-actions > .flex {
+            gap: 10px !important;
+        }
+        #result-actions button[onclick="openShare()"] {
+            padding: 14px 34px;
+            font-size: 0.95rem;
+            line-height: 1;
+        }
+        #instagram-share-btn {
+            padding: 11px 22px;
+            font-size: 0.72rem;
+            line-height: 1;
+        }
+
         @media (max-width: 767px) {
             body {
                 height: auto;
@@ -291,11 +320,10 @@
                 padding: 8px !important;
             }
             .lever-stack {
-                width: 68px;
+                width: 52px;
                 height: 228px;
                 position: relative;
-                flex: 0 0 68px;
-                touch-action: none;
+                flex: 0 0 52px;
             }
             #lever-progress {
                 display: none !important;
@@ -309,11 +337,11 @@
                 transform: translateX(-50%);
             }
             .lever-stack .lever-wrapper {
-                width: 68px !important;
-                height: 220px !important;
+                width: 52px !important;
+                height: 208px !important;
                 position: absolute !important;
                 left: 50%;
-                bottom: 8px;
+                bottom: 20px;
                 transform: translateX(-50%);
             }
             .lever-stack #lever-rod {
@@ -325,8 +353,8 @@
                 height: 34px !important;
             }
             .mini-player {
-                width: min(290px, 86vw);
-                border-radius: 14px;
+                width: min(332px, 92vw);
+                border-radius: 16px;
             }
             .transport-shell {
                 flex-wrap: nowrap;
@@ -334,30 +362,30 @@
                 gap: 6px;
             }
             .transport-cluster {
-                gap: 7px;
+                gap: 8px;
             }
             .progress-cluster {
                 flex: 1 1 auto;
                 min-width: 0;
-                max-width: 112px;
+                max-width: 126px;
             }
             .volume-cluster {
                 flex: 0 0 auto;
             }
             .volume-control {
-                width: min(60px, 16vw);
-                gap: 4px;
+                width: min(68px, 18vw);
+                gap: 5px;
             }
             .player-btn.play-btn {
-                width: 34px;
-                height: 34px;
+                width: 38px;
+                height: 38px;
             }
             .player-btn svg {
-                width: 11px;
-                height: 11px;
+                width: 12px;
+                height: 12px;
             }
             .progress-wrap {
-                padding: 6px 8px;
+                padding: 7px 9px;
             }
             .progress-slider,
             .volume-slider,
@@ -369,65 +397,49 @@
             }
             .progress-slider::-webkit-slider-thumb,
             .volume-slider::-webkit-slider-thumb {
-                width: 7px;
-                height: 7px;
-                margin-top: -2.5px;
+                width: 8px;
+                height: 8px;
+                margin-top: -3px;
             }
             .progress-slider::-moz-range-thumb,
             .volume-slider::-moz-range-thumb {
-                width: 7px;
-                height: 7px;
-            }
-            #result-overlay {
-                justify-content: center !important;
-                gap: 10px;
-                min-height: 100dvh;
-                padding: max(env(safe-area-inset-top), 10px) 14px max(env(safe-area-inset-bottom), 12px) !important;
-                overflow: hidden !important;
-            }
-            #result-header {
-                margin-bottom: 0 !important;
-                flex: 0 0 auto;
+                width: 8px;
+                height: 8px;
             }
             .result-title-tight {
-                font-size: 15px;
-                letter-spacing: 0.07em;
-                line-height: 1.1;
+                font-size: 18px;
+                letter-spacing: 0.08em;
+            }
+            #result-overlay {
+                padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom)) 14px;
+            }
+            #result-stage {
+                max-width: 360px;
+                min-height: calc(100dvh - max(28px, env(safe-area-inset-top)) - max(28px, env(safe-area-inset-bottom)));
+                gap: 14px;
             }
             #result-card-container {
-                width: min(55vw, 220px) !important;
-                max-width: 220px !important;
-                height: auto !important;
-                aspect-ratio: 3 / 4;
-                flex: 0 0 auto;
-            }
-            #result-card-container > div {
-                border-width: 5px !important;
-                padding: 8px !important;
+                width: clamp(164px, 42vw, 216px) !important;
+                height: clamp(246px, 36vh, 324px) !important;
+                max-width: 58vw;
+                max-height: 40vh;
             }
             #result-card-container .card-image-frame {
                 padding: 6px !important;
             }
             #result-actions {
                 width: 100%;
-                margin-top: 0 !important;
-                gap: 10px !important;
-                flex: 0 0 auto;
-            }
-            #result-actions > .flex.flex-col.items-center.gap-3 {
-                gap: 8px !important;
+                gap: 12px !important;
             }
             #result-actions button[onclick="openShare()"] {
-                padding: 10px 18px !important;
-                font-size: 11px !important;
-                line-height: 1 !important;
-                letter-spacing: 0.16em !important;
+                padding: 12px 24px;
+                font-size: 0.78rem;
+                letter-spacing: 0.18em;
             }
             #instagram-share-btn {
-                padding: 9px 14px !important;
-                font-size: 10px !important;
-                line-height: 1 !important;
-                letter-spacing: 0.12em !important;
+                padding: 10px 16px;
+                font-size: 0.66rem;
+                letter-spacing: 0.18em;
             }
             #share-modal .max-w-\[400px\] {
                 max-width: min(92vw, 400px);
@@ -479,14 +491,15 @@
         </div>
     </main>
 
-    <div id="result-overlay" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg hidden flex-col items-center justify-center p-6 opacity-0 transition-opacity duration-1000">
-        <div id="result-header" class="mb-6 md:mb-10 text-center transform -translate-y-10 opacity-0 transition-all duration-700 delay-300">
+    <div id="result-overlay" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg hidden flex-col items-center justify-center opacity-0 transition-opacity duration-1000">
+        <div id="result-stage">
+        <div id="result-header" class="text-center transform -translate-y-10 opacity-0 transition-all duration-700 delay-300">
             <h2 id="result-title" class="result-title-tight text-xl md:text-3xl font-bold text-white">GROUND ZERO CARD #_</h2>
         </div>
 
         <div id="result-card-container" class="transform scale-90 translate-y-10 opacity-0 shadow-[0_0_50px_rgba(255,255,255,0.1)] transition-all duration-1000 delay-500"></div>
 
-        <div id="result-actions" class="mt-8 md:mt-12 flex flex-col items-center gap-6 transform translate-y-10 opacity-0 transition-all duration-700 delay-1000">
+        <div id="result-actions" class="flex flex-col items-center gap-6 transform translate-y-10 opacity-0 transition-all duration-700 delay-1000">
             <div class="mini-player px-2 py-2 md:px-2.5 md:py-2">
                 <div class="transport-shell">
                     <div class="transport-cluster">
@@ -527,6 +540,7 @@
                     Share to Instagram
                 </button>
             </div>
+        </div>
         </div>
     </div>
 
@@ -648,23 +662,19 @@
         window.addEventListener('resize', () => {
             rebuildOnResize();
             updateInstagramButtonVisibility();
+            updateResultLayout();
         });
 
         const leverRod = document.getElementById('lever-rod');
         const leverBall = document.getElementById('lever-ball');
-        const leverWrapper = document.querySelector('.lever-wrapper');
-        const leverStack = document.querySelector('.lever-stack');
         const progressBar = document.getElementById('lever-progress');
         const progressFill = document.getElementById('lever-progress-bar');
-        const TRIGGER_THRESHOLD = window.innerWidth < 768 ? 0.72 : 0.95;
-        const LEVER_PULL_DISTANCE = window.innerWidth < 768 ? 150 : 200;
+        const TRIGGER_THRESHOLD = 0.95;
 
         let isDragging = false;
         let dragStartY = 0;
         let leverProgress = 0;
         let hasTriggered = false;
-        let activePointerId = null;
-        let tapResetTimer = null;
 
         function setLeverAngle(progress) {
             const ballScale = 1 + progress * 0.8;
@@ -687,39 +697,35 @@
             }
         }
 
-        function getClientY(event) {
-            if (event.touches && event.touches.length) return event.touches[0].clientY;
-            if (event.changedTouches && event.changedTouches.length) return event.changedTouches[0].clientY;
-            return event.clientY;
-        }
-
-        function beginLeverInteraction(clientY) {
-            if (isProcessing || hasTriggered) return false;
+        function onDragStart(e) {
+            if (isProcessing || hasTriggered) return;
             isDragging = true;
-            dragStartY = clientY - (leverProgress * LEVER_PULL_DISTANCE);
-            leverStack?.classList.add('lever-active');
-            return true;
+            leverBall.style.cursor = 'grabbing';
+            const point = e.touches ? e.touches[0] : e;
+            dragStartY = point.clientY - (leverProgress * 200);
+            e.preventDefault();
         }
 
-        function updateLeverInteraction(clientY) {
+        function onDragMove(e) {
             if (!isDragging || isProcessing) return;
-            const delta = clientY - dragStartY;
-            leverProgress = Math.max(0, Math.min(1, delta / LEVER_PULL_DISTANCE));
+            const point = e.touches ? e.touches[0] : e;
+            const delta = point.clientY - dragStartY;
+            leverProgress = Math.max(0, Math.min(1, delta / 200));
             setLeverAngle(leverProgress);
 
             if (leverProgress >= TRIGGER_THRESHOLD && !hasTriggered) {
                 hasTriggered = true;
                 isDragging = false;
-                activePointerId = null;
+                leverBall.style.cursor = 'grab';
                 triggerLeverPull();
             }
+            e.preventDefault();
         }
 
-        function endLeverInteraction() {
+        function onDragEnd() {
             if (!isDragging) return;
             isDragging = false;
-            activePointerId = null;
-            leverStack?.classList.remove('lever-active');
+            leverBall.style.cursor = 'grab';
             if (!hasTriggered) {
                 leverRod.style.transition = 'clip-path 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
                 leverBall.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -732,87 +738,12 @@
             }
         }
 
-        function onPointerDown(event) {
-            if (event.pointerType === 'mouse' && event.button !== 0) return;
-            if (!beginLeverInteraction(getClientY(event))) return;
-            activePointerId = event.pointerId ?? null;
-            if (leverWrapper && typeof leverWrapper.setPointerCapture === 'function' && activePointerId !== null) {
-                try { leverWrapper.setPointerCapture(activePointerId); } catch (e) {}
-            }
-            event.preventDefault();
-        }
-
-        function onPointerMove(event) {
-            if (activePointerId !== null && event.pointerId !== activePointerId) return;
-            updateLeverInteraction(getClientY(event));
-            if (isDragging) event.preventDefault();
-        }
-
-        function onPointerUp(event) {
-            if (activePointerId !== null && event.pointerId !== activePointerId) return;
-            endLeverInteraction();
-        }
-
-        function onTouchStart(event) {
-            if (!beginLeverInteraction(getClientY(event))) return;
-            event.preventDefault();
-        }
-
-        function onTouchMove(event) {
-            updateLeverInteraction(getClientY(event));
-            if (isDragging) event.preventDefault();
-        }
-
-        function onTouchEnd() {
-            endLeverInteraction();
-        }
-
-        function onMouseDown(event) {
-            if (event.button !== 0) return;
-            if (!beginLeverInteraction(getClientY(event))) return;
-            event.preventDefault();
-        }
-
-        function onMouseMove(event) {
-            updateLeverInteraction(getClientY(event));
-        }
-
-        function onMouseUp() {
-            endLeverInteraction();
-        }
-
-        function onLeverTap(event) {
-            if (window.innerWidth >= 768 || isProcessing || hasTriggered) return;
-            if (tapResetTimer) clearTimeout(tapResetTimer);
-            leverRod.style.transition = 'clip-path 0.18s ease-out';
-            leverBall.style.transition = 'transform 0.18s ease-out';
-            leverProgress = 0.42;
-            setLeverAngle(leverProgress);
-            tapResetTimer = setTimeout(() => {
-                if (isProcessing || hasTriggered) return;
-                leverProgress = 1;
-                hasTriggered = true;
-                triggerLeverPull();
-            }, 120);
-            event.preventDefault();
-        }
-
-        if (window.PointerEvent) {
-            leverWrapper?.addEventListener('pointerdown', onPointerDown, { passive: false });
-            leverWrapper?.addEventListener('pointermove', onPointerMove, { passive: false });
-            leverWrapper?.addEventListener('pointerup', onPointerUp);
-            leverWrapper?.addEventListener('pointercancel', onPointerUp);
-        } else {
-            leverWrapper?.addEventListener('touchstart', onTouchStart, { passive: false });
-            document.addEventListener('touchmove', onTouchMove, { passive: false });
-            document.addEventListener('touchend', onTouchEnd);
-            document.addEventListener('touchcancel', onTouchEnd);
-            leverWrapper?.addEventListener('mousedown', onMouseDown);
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-        }
-
-        leverWrapper?.addEventListener('click', onLeverTap, { passive: false });
+        leverBall.addEventListener('mousedown', onDragStart);
+        leverBall.addEventListener('touchstart', onDragStart, { passive: false });
+        document.addEventListener('mousemove', onDragMove);
+        document.addEventListener('touchmove', onDragMove, { passive: false });
+        document.addEventListener('mouseup', onDragEnd);
+        document.addEventListener('touchend', onDragEnd);
 
         function triggerLeverPull() {
             leverRod.style.transition = 'clip-path 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -876,31 +807,35 @@
             }, 1200);
         }
 
+        function updateResultLayout() {
+            const cardContainer = document.getElementById('result-card-container');
+            if (!cardContainer) return;
+            const viewportW = window.innerWidth;
+            const viewportH = window.innerHeight;
+            const mobile = viewportW < 768;
+
+            const width = mobile
+                ? Math.max(164, Math.min(viewportW * 0.42, 216))
+                : Math.max(190, Math.min(viewportW * 0.24, 260));
+            const height = mobile
+                ? Math.max(246, Math.min(viewportH * 0.36, 324))
+                : Math.max(285, Math.min(viewportH * 0.43, 390));
+
+            cardContainer.style.width = `${Math.round(width)}px`;
+            cardContainer.style.height = `${Math.round(height)}px`;
+            cardContainer.style.aspectRatio = '';
+        }
+
         function showResultScreen() {
             const overlay = document.getElementById('result-overlay');
             const title = document.getElementById('result-title');
             const cardContainer = document.getElementById('result-card-container');
             const header = document.getElementById('result-header');
             const actions = document.getElementById('result-actions');
-            if (window.innerWidth < 768) {
-                overlay.style.height = '100dvh';
-                overlay.style.maxHeight = '100dvh';
-            } else {
-                overlay.style.height = '';
-                overlay.style.maxHeight = '';
-            }
 
             title.textContent = `GROUND ZERO CARD #${winningCard.id}`;
             cardContainer.innerHTML = getResultCardHTML(winningCard);
-            if (window.innerWidth < 768) {
-                cardContainer.style.width = 'min(55vw, 220px)';
-                cardContainer.style.height = 'auto';
-                cardContainer.style.aspectRatio = '3 / 4';
-            } else {
-                cardContainer.style.width = '315px';
-                cardContainer.style.height = `${CARD_HEIGHT_DESKTOP}px`;
-                cardContainer.style.aspectRatio = '';
-            }
+            updateResultLayout();
 
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
