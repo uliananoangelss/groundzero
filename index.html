@@ -231,6 +231,16 @@
             letter-spacing: 0.1em;
         }
 
+        #result-overlay {
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #result-card-container {
+            flex: 0 0 auto;
+        }
+
         .volume-icon {
             width: 14px;
             height: 14px;
@@ -244,10 +254,14 @@
         }
         
         @media (max-width: 767px) {
+            html,
             body {
                 height: auto;
-                min-height: 100vh;
+                min-height: 100%;
                 overflow-x: hidden;
+            }
+            body {
+                min-height: 100vh;
                 overflow-y: auto;
             }
             main {
@@ -368,16 +382,47 @@
                 font-size: 18px;
                 letter-spacing: 0.08em;
             }
+            #result-overlay {
+                display: block;
+                padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+            }
+            #result-overlay.flex {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+            }
+            #result-header {
+                margin-top: 0;
+                margin-bottom: 16px;
+                flex: 0 0 auto;
+            }
             #result-card-container {
-                width: min(84vw, 315px) !important;
+                width: min(80vw, 280px) !important;
+                max-width: 280px !important;
                 height: auto !important;
+                max-height: 52vh;
                 aspect-ratio: 3 / 4;
+                flex: 0 0 auto;
+            }
+            #result-card-container > div {
+                width: 100%;
+                height: 100%;
             }
             #result-card-container .card-image-frame {
                 padding: 8px !important;
             }
             #result-actions {
+                width: min(92vw, 340px);
+                margin-top: 20px;
+                gap: 16px;
+                flex: 0 0 auto;
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+            #result-actions .flex.flex-col.items-center.gap-3 {
                 width: 100%;
+            }
+            #result-actions button {
+                max-width: 100%;
             }
             #share-modal .max-w-\[400px\] {
                 max-width: min(92vw, 400px);
@@ -748,14 +793,19 @@
             const cardContainer = document.getElementById('result-card-container');
             const header = document.getElementById('result-header');
             const actions = document.getElementById('result-actions');
+            overlay.scrollTop = 0;
 
             title.textContent = `GROUND ZERO CARD #${winningCard.id}`;
             cardContainer.innerHTML = getResultCardHTML(winningCard);
             if (window.innerWidth < 768) {
-                cardContainer.style.width = 'min(84vw, 315px)';
+                cardContainer.style.width = 'min(80vw, 280px)';
+                cardContainer.style.maxWidth = '280px';
                 cardContainer.style.height = 'auto';
+                cardContainer.style.maxHeight = '52vh';
                 cardContainer.style.aspectRatio = '3 / 4';
             } else {
+                cardContainer.style.maxWidth = '';
+                cardContainer.style.maxHeight = '';
                 cardContainer.style.width = '315px';
                 cardContainer.style.height = `${CARD_HEIGHT_DESKTOP}px`;
                 cardContainer.style.aspectRatio = '';
