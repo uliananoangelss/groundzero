@@ -1,0 +1,1101 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GROUND ZERO — NOANGELSS</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <style>
+        @font-face {
+            font-family: 'Helvetica Neue Bold';
+            src: local('Helvetica Neue Bold'), local('Helvetica-Bold'), local('Arial Bold'), sans-serif;
+            font-weight: 700;
+        }
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Helvetica Neue Bold', Helvetica, Arial, sans-serif;
+            text-transform: uppercase;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+        }
+        .bg-noise {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+        }
+        .metal-body {
+            background: linear-gradient(135deg, #2a2a2a 0%, #151515 40%, #0a0a0a 100%);
+            box-shadow: 25px 25px 0px #050505, inset 2px 2px 5px rgba(255,255,255,0.05), inset -5px -5px 15px rgba(0,0,0,0.8);
+            border: 2px solid #333;
+        }
+        .screw {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #666, #222);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.9), 0 1px 1px rgba(255,255,255,0.1);
+            position: absolute;
+            border: 1px solid #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .screw::after {
+            content: '';
+            width: 70%;
+            height: 2px;
+            background: #111;
+            transform: rotate(45deg);
+        }
+        .screen-bezel {
+            background: #000;
+            border: 4px solid #1a1a1a;
+            border-bottom-color: #333;
+            border-right-color: #333;
+            box-shadow: inset 0 0 30px #000;
+            position: relative;
+        }
+        .screen-glass {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, transparent 100%);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
+            pointer-events: none;
+        }
+        .lever-housing {
+            background: linear-gradient(90deg, #111, #222, #0a0a0a);
+            border: 1px solid #333;
+            box-shadow: inset 2px 0 5px rgba(255,255,255,0.05), 5px 5px 15px #000;
+        }
+        .lever-rod {
+            background: linear-gradient(to right, #1a1a1a 0%, #3a3a3a 15%, #888 30%, #d0d0d0 38%, #e8e8e8 42%, #c8c8c8 48%, #777 60%, #444 75%, #2a2a2a 100%);
+            box-shadow: 4px 2px 12px rgba(0,0,0,0.9), -1px 0 3px rgba(0,0,0,0.4), inset 0 2px 3px rgba(255,255,255,0.08);
+            border-radius: 6px;
+        }
+        .lever-ball {
+            background: radial-gradient(circle at 32% 28%, #ff4444 0%, #cc2222 25%, #991111 55%, #661010 75%, #440a0a 100%);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.85), inset 0 -4px 10px rgba(0,0,0,0.45), inset 3px 3px 8px rgba(255,100,100,0.3), inset -2px -2px 6px rgba(0,0,0,0.5);
+        }
+        .lever-wrapper {
+            position: relative;
+        }
+        #lever-rod {
+            transition: none;
+            will-change: clip-path;
+        }
+        #lever-ball {
+            transition: none;
+        }
+        .reel-track {
+            will-change: transform;
+        }
+        .card-shadow {
+            box-shadow: inset 0 0 0 2px #333, inset 0 0 20px #000, 0 10px 30px rgba(0,0,0,0.9);
+        }
+        .card-image-frame {
+            background: #050505;
+            border: 1px solid #222;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+        }
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center center;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+            image-rendering: auto;
+        }
+        .card-item,
+        .card-image-frame,
+        #result-card-container,
+        #result-card-container > div {
+            box-sizing: border-box;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .mini-player {
+            width: min(429px, 92vw);
+            border: 1px solid rgba(255,255,255,0.72);
+            border-radius: 18px;
+            background: rgba(0,0,0,0.72);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.30);
+        }
+        .transport-shell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+        .transport-cluster,
+        .volume-cluster {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 0 0 auto;
+        }
+        .progress-cluster {
+            flex: 1 1 auto;
+            min-width: 140px;
+        }
+        .player-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.72);
+            background: transparent;
+            color: #fff;
+            transition: transform 0.08s ease, background 0.08s ease;
+        }
+        .player-btn:hover {
+            transform: scale(1.04);
+            background: rgba(255,255,255,0.06);
+        }
+        .player-btn:active {
+            transform: scale(0.98);
+        }
+        .player-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: #fff;
+            stroke: #fff;
+            stroke-width: 1.2;
+        }
+        .player-btn.play-btn {
+            width: 42px;
+            height: 42px;
+        }
+        .progress-wrap {
+            border: 1px solid rgba(255,255,255,0.72);
+            border-radius: 999px;
+            padding: 10px 14px;
+            width: 100%;
+        }
+        .progress-slider,
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            outline: none;
+            cursor: pointer;
+            background: transparent;
+        }
+        .progress-slider {
+            height: 3px;
+        }
+        .volume-slider {
+            height: 3px;
+        }
+        .progress-slider::-webkit-slider-runnable-track,
+        .volume-slider::-webkit-slider-runnable-track {
+            height: 3px;
+            background: rgba(255,255,255,0.28);
+            border-radius: 999px;
+        }
+        .progress-slider::-moz-range-track,
+        .volume-slider::-moz-range-track {
+            height: 3px;
+            background: rgba(255,255,255,0.28);
+            border: none;
+            border-radius: 999px;
+        }
+        .progress-slider::-webkit-slider-thumb,
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: #fff;
+            border: none;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+            margin-top: -3px;
+        }
+        .progress-slider::-moz-range-thumb,
+        .volume-slider::-moz-range-thumb {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: #fff;
+            border: none;
+        }
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: min(96px, 22vw);
+        }
+
+        .result-title-tight {
+            letter-spacing: 0.1em;
+        }
+
+        .volume-icon {
+            width: 14px;
+            height: 14px;
+            flex: 0 0 auto;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 1.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0.94;
+        }
+        
+        @media (max-width: 767px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            main {
+                width: min(96vw, 430px);
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                margin-top: 0;
+                padding: 20px 0 28px;
+            }
+            .metal-body {
+                width: 280px !important;
+                height: 392px !important;
+                padding: 16px !important;
+                box-shadow: 14px 14px 0px #050505, inset 2px 2px 5px rgba(255,255,255,0.05), inset -5px -5px 15px rgba(0,0,0,0.8);
+            }
+            .screen-bezel {
+                width: 244px !important;
+                height: 324px !important;
+            }
+            .card-item {
+                border-width: 6px !important;
+                padding: 10px !important;
+            }
+            .card-image-frame {
+                padding: 8px !important;
+            }
+            .lever-stack {
+                width: 52px;
+                height: 228px;
+                position: relative;
+                flex: 0 0 52px;
+            }
+            #lever-progress {
+                display: none !important;
+            }
+            .lever-stack .lever-housing {
+                width: 18px !important;
+                height: 108px !important;
+                position: absolute;
+                left: 50%;
+                bottom: 0;
+                transform: translateX(-50%);
+            }
+            .lever-stack .lever-wrapper {
+                width: 52px !important;
+                height: 208px !important;
+                position: absolute !important;
+                left: 50%;
+                bottom: 20px;
+                transform: translateX(-50%);
+            }
+            .lever-stack #lever-rod {
+                width: 30px !important;
+                height: 172px !important;
+            }
+            .lever-stack #lever-ball {
+                width: 34px !important;
+                height: 34px !important;
+            }
+            .mini-player {
+                width: min(332px, 92vw);
+                border-radius: 16px;
+            }
+            .transport-shell {
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                gap: 6px;
+            }
+            .transport-cluster {
+                gap: 8px;
+            }
+            .progress-cluster {
+                flex: 1 1 auto;
+                min-width: 0;
+                max-width: 126px;
+            }
+            .volume-cluster {
+                flex: 0 0 auto;
+            }
+            .volume-control {
+                width: min(68px, 18vw);
+                gap: 5px;
+            }
+            .player-btn.play-btn {
+                width: 38px;
+                height: 38px;
+            }
+            .player-btn svg {
+                width: 12px;
+                height: 12px;
+            }
+            .progress-wrap {
+                padding: 7px 9px;
+            }
+            .progress-slider,
+            .volume-slider,
+            .progress-slider::-webkit-slider-runnable-track,
+            .volume-slider::-webkit-slider-runnable-track,
+            .progress-slider::-moz-range-track,
+            .volume-slider::-moz-range-track {
+                height: 2px;
+            }
+            .progress-slider::-webkit-slider-thumb,
+            .volume-slider::-webkit-slider-thumb {
+                width: 8px;
+                height: 8px;
+                margin-top: -3px;
+            }
+            .progress-slider::-moz-range-thumb,
+            .volume-slider::-moz-range-thumb {
+                width: 8px;
+                height: 8px;
+            }
+            .result-title-tight {
+                font-size: 18px;
+                letter-spacing: 0.08em;
+            }
+            #result-card-container {
+                width: min(84vw, 315px) !important;
+                height: auto !important;
+                aspect-ratio: 3 / 4;
+            }
+            #result-card-container .card-image-frame {
+                padding: 8px !important;
+            }
+            #result-actions {
+                width: 100%;
+            }
+            #share-modal .max-w-\[400px\] {
+                max-width: min(92vw, 400px);
+            }
+        }
+        #youtube-player-host {
+            position: fixed;
+            width: 1px;
+            height: 1px;
+            opacity: 0.001;
+            pointer-events: none;
+            left: -9999px;
+            top: -9999px;
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col items-center justify-center relative overflow-hidden bg-noise">
+    <main class="relative z-10 flex flex-row items-center justify-center gap-3 md:gap-0 mt-6 md:mt-0 px-3 md:px-0">
+        <div class="relative z-20">
+            <div class="metal-body p-6 md:p-8 rounded-sm relative w-[340px] md:w-[380px] h-[480px] md:h-[540px] flex items-center justify-center">
+                <div class="screw top-3 left-3"></div>
+                <div class="screw top-3 right-3 transform rotate-45"></div>
+                <div class="screw bottom-3 left-3 transform rotate-90"></div>
+                <div class="screw bottom-3 right-3 transform rotate-12"></div>
+
+                <div class="screen-bezel w-[300px] h-[400px] md:w-[315px] md:h-[420px] overflow-hidden relative">
+                    <div id="reel" class="reel-track absolute top-0 left-0 w-full flex flex-col"></div>
+                    <div class="screen-glass absolute inset-0 z-30"></div>
+                    <div class="absolute top-1/2 left-0 w-full h-[2px] bg-red-500/20 shadow-[0_0_10px_rgba(255,0,0,0.5)] -translate-y-1/2 z-20 mix-blend-screen pointer-events-none"></div>
+                </div>
+
+                <div class="absolute bottom-4 w-full left-0 flex justify-center gap-4 opacity-50">
+                    <div class="w-8 h-1 bg-black border-b border-zinc-700"></div>
+                    <div class="w-8 h-1 bg-black border-b border-zinc-700"></div>
+                    <div class="w-8 h-1 bg-black border-b border-zinc-700"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lever-stack relative md:absolute md:right-[-100px] md:top-1/2 md:-translate-y-1/2 z-30 shrink-0">
+            <div class="lever-housing w-[18px] h-[110px] md:w-[30px] md:h-[120px] rounded-sm relative z-0 border-r-4 border-black"></div>
+            <div class="lever-wrapper w-[54px] h-[210px] md:w-[40px] md:h-[280px] md:absolute md:top-[-80px] md:left-[-5px]">
+                <div id="lever-rod" class="lever-rod w-[32px] md:w-[70px] h-[172px] md:h-[240px] absolute bottom-0 left-1/2 -translate-x-1/2"></div>
+                <div id="lever-ball" class="lever-ball w-[34px] h-[34px] md:w-[70px] md:h-[70px] rounded-full absolute top-0 left-1/2 z-20 cursor-grab" style="transform: translateX(-50%)"></div>
+            </div>
+            <div id="lever-progress" class="md:hidden absolute -bottom-5 left-1/2 -translate-x-1/2 w-[54px] h-[4px] bg-zinc-800 rounded-full overflow-hidden opacity-0 transition-opacity" aria-hidden="true">
+                <div id="lever-progress-bar" class="h-full bg-white rounded-full transition-all duration-75" style="width: 0%"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="result-overlay" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg hidden flex-col items-center justify-center p-6 opacity-0 transition-opacity duration-1000">
+        <div id="result-header" class="mb-6 md:mb-10 text-center transform -translate-y-10 opacity-0 transition-all duration-700 delay-300">
+            <h2 id="result-title" class="result-title-tight text-xl md:text-3xl font-bold text-white">GROUND ZERO CARD #_</h2>
+        </div>
+
+        <div id="result-card-container" class="transform scale-90 translate-y-10 opacity-0 shadow-[0_0_50px_rgba(255,255,255,0.1)] transition-all duration-1000 delay-500"></div>
+
+        <div id="result-actions" class="mt-8 md:mt-12 flex flex-col items-center gap-6 transform translate-y-10 opacity-0 transition-all duration-700 delay-1000">
+            <div class="mini-player px-2 py-2 md:px-2.5 md:py-2">
+                <div class="transport-shell">
+                    <div class="transport-cluster">
+                        <button id="play-pause-btn" type="button" class="player-btn play-btn" aria-label="Pause audio">
+                            <svg id="play-icon" viewBox="0 0 24 24" aria-hidden="true" style="display:none; fill:#fff; stroke:none; margin-left:2px;">
+                                <path d="M8 6v12l10-6-10-6Z"></path>
+                            </svg>
+                            <svg id="pause-icon" viewBox="0 0 24 24" aria-hidden="true" style="fill:#fff; stroke:none;">
+                                <path d="M7 6h4v12H7zM13 6h4v12h-4z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="progress-cluster">
+                        <div class="progress-wrap">
+                            <input id="progress-slider" class="progress-slider" type="range" min="0" max="1000" value="0" aria-label="Track position">
+                        </div>
+                    </div>
+
+                    <div class="volume-cluster">
+                        <div class="volume-control">
+                            <svg id="volume-icon" class="volume-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 9h4l5-4v14l-5-4H4z"></path>
+                                <path id="volume-wave-1" d="M16 9.5c1.2 1.2 1.2 3.8 0 5"></path>
+                                <path id="volume-wave-2" d="M19 7c2.4 2.3 2.4 7.7 0 10"></path>
+                                <path id="volume-mute" d="M16.5 9.5l5 5m0-5l-5 5" style="display:none"></path>
+                            </svg>
+                            <input id="volume-slider" class="volume-slider" type="range" min="0" max="100" value="70" aria-label="Volume">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col items-center gap-3">
+               <button onclick="openShare()" class="px-8 py-4 bg-white text-black font-bold tracking-[0.2em] text-sm md:text-lg hover:bg-zinc-300 hover:scale-105 transition-all uppercase border-2 border-white">
+    Share Your Card
+</button>
+                <button id="instagram-share-btn" onclick="shareToInstagram()" class="px-6 py-3 bg-black text-white font-bold tracking-[0.2em] text-xs md:text-sm uppercase border border-zinc-600 hover:border-white hover:scale-105 transition-all">
+                    Share to Instagram
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="share-modal" class="fixed inset-0 z-[60] bg-black/90 hidden flex-col items-center justify-center p-4">
+        <div class="w-full max-w-[400px] h-[80vh] max-h-[800px] bg-[#111] border border-zinc-800 rounded-xl px-6 py-7 flex flex-col relative overflow-y-auto scrollbar-hide">
+            <button onclick="closeShare()" class="absolute top-4 right-4 text-zinc-500 hover:text-white text-xl p-2">×</button>
+        
+            <div class="mt-5 flex flex-col gap-5">
+                <div id="story-card-preview" class="w-full aspect-[3/4] scale-90 origin-top"></div>
+                <div class="text-center border border-zinc-800 px-6 py-5 bg-black">
+                    <p class="font-bold text-white tracking-widest text-lg mb-1">GROUND ZERO</p>
+                    <p class="text-xs text-zinc-500 mb-4">NOANGELSS, BLACKAWASAKI</p>
+                    <p class="text-sm text-white tracking-widest">ADD INSTAGRAM MUSIC STICKER</p>
+                </div>
+                <div class="text-center text-xs text-zinc-600 space-y-4">
+                    <p id="share-modal-hint">Use share, or download the story card and post it in Instagram Stories adding Ground Zero.</p>
+                    <button onclick="downloadStoryCard()" class="px-4 py-2 border border-zinc-700 text-white uppercase tracking-[0.08em] hover:border-white transition-all">Download story card</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="youtube-player-host"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        const cardData = [
+            { id: 1, start: 6, image: 'GTRCARD1copy.png' },
+            { id: 2, start: 49, image: 'GTRCARD2copy.png' },
+            { id: 3, start: 10, image: 'GTRCARD3copy.png' },
+            { id: 4, start: 54, image: 'GTRCARD4copy.png' },
+            { id: 5, start: 75, image: 'GTRCARD5copy.png' },
+            { id: 6, start: 63, image: 'GTRCARD6copy.png' },
+            { id: 7, start: 63, image: 'GTRCARD7copy.png' },
+            { id: 8, start: 78, image: 'GTRCARD8copy.png' },
+            { id: 9, start: 104, image: 'GTRCARD9copy.png' },
+            { id: 10, start: 81, image: 'GTRCARD10copy.png' }
+        ];
+
+        const reelEl = document.getElementById('reel');
+        const CARD_HEIGHT_DESKTOP = 420;
+        const CARD_HEIGHT_MOBILE = 324;
+        const TOTAL_SETS = 8;
+        const START_SPEED = 38;
+        let isSpinning = false;
+        let isProcessing = false;
+        let currentY = 0;
+        let speed = START_SPEED;
+        let animationFrameId;
+        let winningCard = null;
+        let activeCardHeight = window.innerWidth < 768 ? CARD_HEIGHT_MOBILE : CARD_HEIGHT_DESKTOP;
+        let player = null;
+        let pendingTrackStart = null;
+        let isPlayerPlaying = false;
+        let progressInterval = null;
+        let isScrubbingProgress = false;
+
+        function getReelCardHTML(card) {
+            return `
+                <div class="card-item w-full h-[${activeCardHeight}px] flex-shrink-0 bg-[#0a0a0a] border-[8px] border-[#151515] p-3 md:p-4 relative overflow-hidden card-shadow" style="height: ${activeCardHeight}px;">
+                    <div class="absolute inset-0 bg-noise opacity-40 z-0"></div>
+                    <div class="relative z-10 w-full h-full card-image-frame flex items-center justify-center p-2 md:p-3 overflow-hidden">
+                        <img src="${card.image}" alt="GROUND ZERO CARD #${card.id}" class="card-image" loading="eager" draggable="false" />
+                    </div>
+                </div>
+            `;
+        }
+
+        function getResultCardHTML(card) {
+            return `
+                <div class="w-full h-full bg-[#0a0a0a] border-[8px] border-[#151515] p-3 md:p-4 relative overflow-hidden card-shadow">
+                    <div class="absolute inset-0 bg-noise opacity-40 z-0"></div>
+                    <div class="relative z-10 w-full h-full card-image-frame flex items-center justify-center p-2 md:p-3 overflow-hidden">
+                        <img src="${card.image}" alt="GROUND ZERO CARD #${card.id}" class="card-image" loading="eager" draggable="false" />
+                    </div>
+                </div>
+            `;
+        }
+
+        function initMachine() {
+            let html = '';
+            for (let i = 0; i < TOTAL_SETS; i++) {
+                cardData.forEach((card) => {
+                    html += getReelCardHTML(card);
+                });
+            }
+            reelEl.innerHTML = html;
+            setLeverAngle(0);
+        }
+
+        function startIdleSpin() {
+            if (!isSpinning) return;
+            currentY -= speed;
+            const setHeight = cardData.length * activeCardHeight;
+            if (currentY <= -setHeight) currentY += setHeight;
+            reelEl.style.transform = `translateY(${currentY}px)`;
+            animationFrameId = requestAnimationFrame(startIdleSpin);
+        }
+
+        function startAmbientSpin() {
+            if (isSpinning) return;
+            reelEl.style.transition = 'none';
+            isSpinning = true;
+            speed = START_SPEED;
+            cancelAnimationFrame(animationFrameId);
+            startIdleSpin();
+        }
+
+        function rebuildOnResize() {
+            const previousHeight = activeCardHeight;
+            activeCardHeight = window.innerWidth < 768 ? CARD_HEIGHT_MOBILE : CARD_HEIGHT_DESKTOP;
+            if (previousHeight === activeCardHeight) return;
+            const normalized = previousHeight ? currentY / previousHeight : 0;
+            initMachine();
+            currentY = normalized * activeCardHeight;
+            reelEl.style.transform = `translateY(${currentY}px)`;
+        }
+
+        window.addEventListener('resize', () => {
+            rebuildOnResize();
+            updateInstagramButtonVisibility();
+        });
+
+        const leverRod = document.getElementById('lever-rod');
+        const leverBall = document.getElementById('lever-ball');
+        const progressBar = document.getElementById('lever-progress');
+        const progressFill = document.getElementById('lever-progress-bar');
+        const TRIGGER_THRESHOLD = 0.95;
+
+        let isDragging = false;
+        let dragStartY = 0;
+        let leverProgress = 0;
+        let hasTriggered = false;
+
+        function setLeverAngle(progress) {
+            const ballScale = 1 + progress * 0.8;
+            const moveDown = progress * 180;
+            leverBall.style.transform = `translateX(-50%) translateY(${moveDown}px) scale(${ballScale})`;
+
+            const rodW = leverRod.offsetWidth;
+            const rodH = leverRod.offsetHeight;
+            const cx = rodW / 2;
+            const topShift = moveDown;
+            const topHalf = 8 + progress * 12;
+            const botHalf = 8;
+
+            leverRod.style.clipPath = `polygon(${cx - topHalf}px ${topShift}px, ${cx + topHalf}px ${topShift}px, ${cx + botHalf}px ${rodH}px, ${cx - botHalf}px ${rodH}px)`;
+
+            if (progressBar) {
+                progressBar.style.opacity = progress > 0.01 ? '1' : '0';
+                progressFill.style.width = `${progress * 100}%`;
+                progressFill.style.background = progress >= TRIGGER_THRESHOLD ? '#ef4444' : '#fff';
+            }
+        }
+
+        function onDragStart(e) {
+            if (isProcessing || hasTriggered) return;
+            isDragging = true;
+            leverBall.style.cursor = 'grabbing';
+            const point = e.touches ? e.touches[0] : e;
+            dragStartY = point.clientY - (leverProgress * 200);
+            e.preventDefault();
+        }
+
+        function onDragMove(e) {
+            if (!isDragging || isProcessing) return;
+            const point = e.touches ? e.touches[0] : e;
+            const delta = point.clientY - dragStartY;
+            leverProgress = Math.max(0, Math.min(1, delta / 200));
+            setLeverAngle(leverProgress);
+
+            if (leverProgress >= TRIGGER_THRESHOLD && !hasTriggered) {
+                hasTriggered = true;
+                isDragging = false;
+                leverBall.style.cursor = 'grab';
+                triggerLeverPull();
+            }
+            e.preventDefault();
+        }
+
+        function onDragEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            leverBall.style.cursor = 'grab';
+            if (!hasTriggered) {
+                leverRod.style.transition = 'clip-path 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                leverBall.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                leverProgress = 0;
+                setLeverAngle(0);
+                setTimeout(() => {
+                    leverRod.style.transition = 'none';
+                    leverBall.style.transition = 'none';
+                }, 500);
+            }
+        }
+
+        leverBall.addEventListener('mousedown', onDragStart);
+        leverBall.addEventListener('touchstart', onDragStart, { passive: false });
+        document.addEventListener('mousemove', onDragMove);
+        document.addEventListener('touchmove', onDragMove, { passive: false });
+        document.addEventListener('mouseup', onDragEnd);
+        document.addEventListener('touchend', onDragEnd);
+
+        function triggerLeverPull() {
+            leverRod.style.transition = 'clip-path 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+            leverBall.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+            leverProgress = 1;
+            setLeverAngle(1);
+            startLeverRumble();
+            handleLeverPull();
+        }
+
+        let rumbleId = null;
+        function startLeverRumble() {
+            leverBall.style.transition = 'none';
+            leverRod.style.transition = 'none';
+            function rumble() {
+                const offsetX = (Math.random() - 0.5) * 6;
+                const offsetY = (Math.random() - 0.5) * 4;
+                const baseDown = 180;
+                const baseScale = 1.8;
+                leverBall.style.transform = `translateX(calc(-50% + ${offsetX}px)) translateY(${baseDown + offsetY}px) scale(${baseScale})`;
+                rumbleId = requestAnimationFrame(rumble);
+            }
+            rumbleId = requestAnimationFrame(rumble);
+        }
+
+        function stopLeverRumble() {
+            if (rumbleId) {
+                cancelAnimationFrame(rumbleId);
+                rumbleId = null;
+            }
+            leverBall.style.transition = 'transform 0.3s ease-out';
+            leverProgress = 1;
+            setLeverAngle(1);
+        }
+
+        function handleLeverPull() {
+            if (isProcessing) return;
+            isProcessing = true;
+            setTimeout(() => {
+                isSpinning = false;
+                cancelAnimationFrame(animationFrameId);
+                stopLeverRumble();
+
+                const winIndex = Math.floor(Math.random() * cardData.length);
+                winningCard = cardData[winIndex];
+
+                const targetSetIndex = 5;
+                const targetDOMIndex = (targetSetIndex * cardData.length) + winIndex;
+                const targetY = -(targetDOMIndex * activeCardHeight);
+
+                reelEl.style.transition = 'none';
+                reelEl.style.transform = `translateY(${currentY}px)`;
+                reelEl.offsetHeight;
+                reelEl.style.transition = 'transform 4s cubic-bezier(0.15, 0.85, 0.35, 1.05)';
+                reelEl.style.transform = `translateY(${targetY}px)`;
+                currentY = targetY;
+
+                setTimeout(() => {
+                    showResultScreen();
+                }, 4300);
+            }, 1200);
+        }
+
+        function showResultScreen() {
+            const overlay = document.getElementById('result-overlay');
+            const title = document.getElementById('result-title');
+            const cardContainer = document.getElementById('result-card-container');
+            const header = document.getElementById('result-header');
+            const actions = document.getElementById('result-actions');
+
+            title.textContent = `GROUND ZERO CARD #${winningCard.id}`;
+            cardContainer.innerHTML = getResultCardHTML(winningCard);
+            if (window.innerWidth < 768) {
+                cardContainer.style.width = 'min(84vw, 315px)';
+                cardContainer.style.height = 'auto';
+                cardContainer.style.aspectRatio = '3 / 4';
+            } else {
+                cardContainer.style.width = '315px';
+                cardContainer.style.height = `${CARD_HEIGHT_DESKTOP}px`;
+                cardContainer.style.aspectRatio = '';
+            }
+
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            overlay.offsetHeight;
+            overlay.classList.remove('opacity-0');
+
+            setTimeout(() => {
+                header.classList.remove('-translate-y-10', 'opacity-0');
+                header.classList.add('translate-y-0', 'opacity-100');
+            }, 300);
+
+            setTimeout(() => {
+                cardContainer.classList.remove('translate-y-10', 'opacity-0', 'scale-90');
+                cardContainer.classList.add('translate-y-0', 'opacity-100', 'scale-105', 'md:scale-110');
+            }, 600);
+
+            setTimeout(() => {
+                actions.classList.remove('translate-y-10', 'opacity-0');
+                actions.classList.add('translate-y-0', 'opacity-100');
+                playWinningTrack();
+            }, 1200);
+        }
+
+        function onYouTubeIframeAPIReady() {
+            const safePlayerVars = {
+                autoplay: 0,
+                controls: 0,
+                modestbranding: 1,
+                rel: 0,
+                playsinline: 1,
+                enablejsapi: 1
+            };
+
+            if (/^https?:$/i.test(window.location.protocol) && window.location.origin && window.location.origin !== 'null') {
+                safePlayerVars.origin = window.location.origin;
+            }
+
+            player = new YT.Player('youtube-player-host', {
+                videoId: '-hO0nKWutBo',
+                host: 'https://www.youtube-nocookie.com',
+                playerVars: safePlayerVars,
+                events: {
+                    onReady: () => {
+                        const slider = document.getElementById('volume-slider');
+                        if (slider) player.setVolume(Number(slider.value || 70));
+                        updateVolumeIcon(Number(slider?.value || 70));
+                        startProgressTracking();
+                        if (pendingTrackStart !== null) {
+                            playWinningTrack();
+                        }
+                    },
+                    onStateChange: (event) => {
+                        const state = event.data;
+                        if (state === YT.PlayerState.PLAYING) {
+                            isPlayerPlaying = true;
+                        } else if (state === YT.PlayerState.PAUSED || state === YT.PlayerState.ENDED || state === YT.PlayerState.CUED) {
+                            isPlayerPlaying = false;
+                        }
+                        updatePlayPauseUI();
+                        if (state === YT.PlayerState.ENDED) {
+                            updateProgressSlider();
+                        }
+                    }
+                }
+            });
+        }
+        window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+
+        function playWinningTrack() {
+            if (!winningCard) return;
+            pendingTrackStart = winningCard.start;
+            if (!player || typeof player.loadVideoById !== 'function') return;
+            const slider = document.getElementById('volume-slider');
+            const volume = Number(slider?.value || 70);
+            player.setVolume(volume);
+            updateVolumeIcon(volume);
+            player.loadVideoById({ videoId: '-hO0nKWutBo', startSeconds: winningCard.start, suggestedQuality: 'small' });
+            player.playVideo();
+            isPlayerPlaying = true;
+            updatePlayPauseUI();
+            updateProgressSlider();
+            pendingTrackStart = null;
+        }
+
+        function updatePlayPauseUI() {
+            const playIcon = document.getElementById('play-icon');
+            const pauseIcon = document.getElementById('pause-icon');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            if (!playIcon || !pauseIcon || !playPauseBtn) return;
+            playIcon.style.display = isPlayerPlaying ? 'none' : 'block';
+            pauseIcon.style.display = isPlayerPlaying ? 'block' : 'none';
+            playPauseBtn.setAttribute('aria-label', isPlayerPlaying ? 'Pause audio' : 'Play audio');
+        }
+
+        function updateVolumeIcon(volume) {
+            const wave1 = document.getElementById('volume-wave-1');
+            const wave2 = document.getElementById('volume-wave-2');
+            const mute = document.getElementById('volume-mute');
+            if (!wave1 || !wave2 || !mute) return;
+            if (volume <= 0) {
+                wave1.style.display = 'none';
+                wave2.style.display = 'none';
+                mute.style.display = 'block';
+            } else if (volume < 45) {
+                wave1.style.display = 'block';
+                wave2.style.display = 'none';
+                mute.style.display = 'none';
+            } else {
+                wave1.style.display = 'block';
+                wave2.style.display = 'block';
+                mute.style.display = 'none';
+            }
+        }
+
+        function togglePlayback() {
+            if (!player || typeof player.playVideo !== 'function') return;
+            if (isPlayerPlaying) {
+                player.pauseVideo();
+                isPlayerPlaying = false;
+            } else {
+                player.playVideo();
+                isPlayerPlaying = true;
+            }
+            updatePlayPauseUI();
+        }
+
+        function seekBy(seconds) {
+            if (!player || typeof player.getCurrentTime !== 'function' || typeof player.seekTo !== 'function') return;
+            const current = Number(player.getCurrentTime() || 0);
+            const target = Math.max(0, current + seconds);
+            player.seekTo(target, true);
+            if (!isPlayerPlaying && typeof player.playVideo === 'function') {
+                player.playVideo();
+                isPlayerPlaying = true;
+                updatePlayPauseUI();
+            }
+        }
+
+        const volumeSliderEl = document.getElementById('volume-slider');
+        if (volumeSliderEl) {
+            volumeSliderEl.addEventListener('input', (e) => {
+                const volume = Number(e.target.value);
+                if (player && typeof player.setVolume === 'function') {
+                    player.setVolume(volume);
+                }
+                updateVolumeIcon(volume);
+            });
+            updateVolumeIcon(Number(volumeSliderEl.value || 70));
+        }
+
+        const progressSliderEl = document.getElementById('progress-slider');
+        if (progressSliderEl) {
+            progressSliderEl.addEventListener('input', (e) => {
+                isScrubbingProgress = true;
+                seekToProgressValue(e.target.value);
+            });
+            progressSliderEl.addEventListener('change', (e) => {
+                seekToProgressValue(e.target.value);
+                isScrubbingProgress = false;
+            });
+            progressSliderEl.addEventListener('pointerdown', () => { isScrubbingProgress = true; });
+            progressSliderEl.addEventListener('pointerup', (e) => {
+                seekToProgressValue(e.target.value);
+                isScrubbingProgress = false;
+            });
+        }
+
+        document.getElementById('play-pause-btn')?.addEventListener('click', togglePlayback);
+
+
+        function updateProgressSlider() {
+            const progressSlider = document.getElementById('progress-slider');
+            if (!progressSlider || !player || typeof player.getCurrentTime !== 'function' || typeof player.getDuration !== 'function' || isScrubbingProgress) return;
+            const duration = Number(player.getDuration() || 0);
+            const current = Number(player.getCurrentTime() || 0);
+            if (!duration || !isFinite(duration)) {
+                progressSlider.value = 0;
+                return;
+            }
+            const nextValue = Math.max(0, Math.min(1000, Math.round((current / duration) * 1000)));
+            progressSlider.value = String(nextValue);
+        }
+
+        function startProgressTracking() {
+            if (progressInterval) clearInterval(progressInterval);
+            progressInterval = setInterval(updateProgressSlider, 250);
+        }
+
+        function seekToProgressValue(value) {
+            if (!player || typeof player.seekTo !== 'function' || typeof player.getDuration !== 'function') return;
+            const duration = Number(player.getDuration() || 0);
+            if (!duration || !isFinite(duration)) return;
+            const target = Math.max(0, Math.min(duration, (Number(value) / 1000) * duration));
+            player.seekTo(target, true);
+            updateProgressSlider();
+        }
+
+        function showFallbackShareModal() {
+            const modal = document.getElementById('share-modal');
+            const preview = document.getElementById('story-card-preview');
+            preview.innerHTML = getResultCardHTML(winningCard);
+            preview.firstElementChild.style.height = '100%';
+            preview.firstElementChild.style.width = '100%';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeShare() {
+            const modal = document.getElementById('share-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function isMobileDevice() {
+            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.matchMedia('(pointer: coarse)').matches;
+        }
+
+        function updateInstagramButtonVisibility() {
+            const btn = document.getElementById('instagram-share-btn');
+            if (!btn) return;
+            btn.style.display = isMobileDevice() ? 'inline-flex' : 'none';
+        }
+
+        async function loadCardImage(card) {
+            const response = await fetch(card.image);
+            if (!response.ok) throw new Error(`Failed to load ${card.image}`);
+            return await response.blob();
+        }
+
+        async function buildStoryBlob() {
+            if (!winningCard) throw new Error('No card selected yet');
+            const canvas = document.createElement('canvas');
+            canvas.width = 1080;
+            canvas.height = 1920;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const offsetY = Math.round(canvas.height * 0.08);
+
+            const blob = await loadCardImage(winningCard);
+            const bitmap = await createImageBitmap(blob);
+            const title = `GROUND ZERO CARD #${winningCard.id}`;
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '700 46px Helvetica Neue, Helvetica, Arial, sans-serif';
+            ctx.fillText(title, canvas.width / 2, 140 + offsetY);
+            ctx.font = '700 28px Helvetica Neue, Helvetica, Arial, sans-serif';
+            ctx.fillStyle = '#a1a1aa';
+           
+
+            const maxW = 820;
+            const maxH = 1092;
+            const scale = Math.min(maxW / bitmap.width, maxH / bitmap.height);
+            const drawW = Math.round(bitmap.width * scale);
+            const drawH = Math.round(bitmap.height * scale);
+            const drawX = Math.round((canvas.width - drawW) / 2);
+            const drawY = 290 + offsetY;
+
+            ctx.fillStyle = '#090909';
+            ctx.fillRect(drawX - 26, drawY - 26, drawW + 52, drawH + 52);
+            ctx.strokeStyle = '#232323';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(drawX - 26, drawY - 26, drawW + 52, drawH + 52);
+            ctx.drawImage(bitmap, drawX, drawY, drawW, drawH);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '700 34px Helvetica Neue, Helvetica, Arial, sans-serif';
+            
+            ctx.fillStyle = '#71717a';
+            ctx.font = '700 22px Helvetica Neue, Helvetica, Arial, sans-serif';
+            ctx.fillText('GROUND ZERO — NOANGELSS, BLACKAWASAKI', canvas.width / 2, drawY + drawH + 165);
+            
+
+            const pngBlob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+            if (!pngBlob) throw new Error('Could not create image');
+            return pngBlob;
+        }
+
+        async function downloadStoryCard() {
+            const blob = await buildStoryBlob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ground-zero-card-${winningCard.id}.png`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        async function openShare() {
+            const shareTitle = 'GROUND ZERO — NOANGELSS';
+            const shareText = `I pulled GROUND ZERO CARD #${winningCard.id}. Add the song GROUND ZERO — NOANGELSS, BLACKAWASAKI in Instagram Music.`;
+            const shareUrl = window.location.href;
+            try {
+                const storyBlob = await buildStoryBlob();
+                const storyFile = new File([storyBlob], `ground-zero-card-${winningCard.id}.png`, { type: 'image/png' });
+                if (navigator.canShare && navigator.canShare({ files: [storyFile] })) {
+                    await navigator.share({ title: shareTitle, text: shareText, files: [storyFile] });
+                    return;
+                }
+                if (navigator.share) {
+                    await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+                    return;
+                }
+            } catch (error) {
+                console.log('Native share unavailable', error);
+            }
+            showFallbackShareModal();
+        }
+
+        async function shareToInstagram() {
+            try {
+                const storyBlob = await buildStoryBlob();
+                const storyFile = new File([storyBlob], `ground-zero-card-${winningCard.id}.png`, { type: 'image/png' });
+                const shareText = `GROUND ZERO CARD #${winningCard.id} — add GROUND ZERO in Instagram Music.`;
+                if (navigator.canShare && navigator.canShare({ files: [storyFile] })) {
+                    await navigator.share({ files: [storyFile], title: 'Share to Instagram', text: shareText });
+                    return;
+                }
+                await downloadStoryCard();
+                const scheme = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'instagram://camera' : 'instagram://story-camera';
+                window.location.href = scheme;
+            } catch (error) {
+                console.log('Instagram share fallback', error);
+                showFallbackShareModal();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initMachine();
+            updateInstagramButtonVisibility();
+            startAmbientSpin();
+        });
+    </script>
+</body>
+</html>
