@@ -77,6 +77,23 @@
         .lever-wrapper {
             position: relative;
             touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .lever-stack {
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #lever-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -12px;
+            z-index: 5;
+        }
+        #lever-ball,
+        #lever-rod {
+            pointer-events: none;
         }
         #lever-rod {
             transition: none;
@@ -469,7 +486,7 @@
 
         <div class="lever-stack relative md:absolute md:right-[-100px] md:top-1/2 md:-translate-y-1/2 z-30 shrink-0">
             <div class="lever-housing w-[18px] h-[110px] md:w-[30px] md:h-[120px] rounded-sm relative z-0 border-r-4 border-black"></div>
-            <div class="lever-wrapper w-[54px] h-[210px] md:w-[40px] md:h-[280px] md:absolute md:top-[-80px] md:left-[-5px]">
+            <div id="lever-wrapper" class="lever-wrapper w-[54px] h-[210px] md:w-[40px] md:h-[280px] md:absolute md:top-[-80px] md:left-[-5px]">
                 <div id="lever-rod" class="lever-rod w-[32px] md:w-[70px] h-[172px] md:h-[240px] absolute bottom-0 left-1/2 -translate-x-1/2"></div>
                 <div id="lever-ball" class="lever-ball w-[34px] h-[34px] md:w-[70px] md:h-[70px] rounded-full absolute top-0 left-1/2 z-20 cursor-grab" style="transform: translateX(-50%)"></div>
             </div>
@@ -652,25 +669,44 @@
 
         const leverRod = document.getElementById('lever-rod');
         const leverBall = document.getElementById('lever-ball');
+        const leverWrapper = document.getElementById('lever-wrapper');
         const progressBar = document.getElementById('lever-progress');
         const progressFill = document.getElementById('lever-progress-bar');
-        const TRIGGER_THRESHOLD = 0.95;
+        const TRIGGER_THRESHOLD = 0.78;
+        const LEVER_TRAVEL = 180;
 
         let isDragging = false;
-        let dragStartY = 0;
         let leverProgress = 0;
         let hasTriggered = false;
         let activePointerId = null;
+        let startClientY = 0;
+        let startProgress = 0;
+        let dragDistance = 0;
+        let dragStartedAt = 0;
 
         function getClientPoint(e) {
-            if (e.touches && e.touches.length) return e.touches[0];
-            if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0];
+            if (e.touches && e.touches.length) {
+                if (activePointerId !== null) {
+                    for (const touch of e.touches) {
+                        if (touch.identifier === activePointerId) return touch;
+                    }
+                }
+                return e.touches[0];
+            }
+            if (e.changedTouches && e.changedTouches.length) {
+                if (activePointerId !== null) {
+                    for (const touch of e.changedTouches) {
+                        if (touch.identifier === activePointerId) return touch;
+                    }
+                }
+                return e.changedTouches[0];
+            }
             return e;
         }
 
         function setLeverAngle(progress) {
             const ballScale = 1 + progress * 0.8;
-            const moveDown = progress * 180;
+            const moveDown = progress * LEVER_TRAVEL;
             leverBall.style.transform = `translateX(-50%) translateY(${moveDown}px) scale(${ballScale})`;
 
             const rodW = leverRod.offsetWidth;
@@ -689,23 +725,38 @@
             }
         }
 
+        function resetLeverPosition() {
+            leverRod.style.transition = 'clip-path 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+            leverBall.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+            leverProgress = 0;
+            setLeverAngle(0);
+            setTimeout(() => {
+                leverRod.style.transition = 'none';
+                leverBall.style.transition = 'none';
+            }, 500);
+        }
+
         function onDragStart(e) {
             if (isProcessing || hasTriggered) return;
-            isDragging = true;
-            leverBall.style.cursor = 'grabbing';
             const point = getClientPoint(e);
-            activePointerId = point && 'identifier' in point ? point.identifier : 'mouse';
-            dragStartY = point.clientY - (leverProgress * 200);
-            e.preventDefault();
+            if (!point) return;
+            isDragging = true;
+            dragDistance = 0;
+            dragStartedAt = Date.now();
+            activePointerId = point && point.identifier !== undefined ? point.identifier : (e.pointerId !== undefined ? e.pointerId : 'mouse');
+            startClientY = point.clientY;
+            startProgress = leverProgress;
+            leverBall.style.cursor = 'grabbing';
+            if (e.cancelable) e.preventDefault();
         }
 
         function onDragMove(e) {
             if (!isDragging || isProcessing) return;
             const point = getClientPoint(e);
             if (!point) return;
-            if (point.identifier !== undefined && activePointerId !== null && activePointerId !== point.identifier) return;
-            const delta = point.clientY - dragStartY;
-            leverProgress = Math.max(0, Math.min(1, delta / 200));
+            const delta = point.clientY - startClientY;
+            dragDistance = Math.max(dragDistance, Math.abs(delta));
+            leverProgress = Math.max(0, Math.min(1, startProgress + (delta / LEVER_TRAVEL)));
             setLeverAngle(leverProgress);
 
             if (leverProgress >= TRIGGER_THRESHOLD && !hasTriggered) {
@@ -715,35 +766,39 @@
                 leverBall.style.cursor = 'grab';
                 triggerLeverPull();
             }
-            e.preventDefault();
+            if (e.cancelable) e.preventDefault();
         }
 
         function onDragEnd(e) {
             if (!isDragging) return;
             const point = getClientPoint(e || {});
-            if (point && point.identifier !== undefined && activePointerId !== null && activePointerId !== point.identifier) return;
+            if (point && point.identifier !== undefined && activePointerId !== null && point.identifier !== activePointerId) return;
             isDragging = false;
             activePointerId = null;
             leverBall.style.cursor = 'grab';
-            if (!hasTriggered) {
-                leverRod.style.transition = 'clip-path 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-                leverBall.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-                leverProgress = 0;
-                setLeverAngle(0);
-                setTimeout(() => {
-                    leverRod.style.transition = 'none';
-                    leverBall.style.transition = 'none';
-                }, 500);
+
+            const wasQuickTap = dragDistance < 10 && (Date.now() - dragStartedAt) < 260;
+            if (!hasTriggered && wasQuickTap) {
+                hasTriggered = true;
+                triggerLeverPull();
+                return;
             }
+
+            if (!hasTriggered) resetLeverPosition();
+            if (e && e.cancelable) e.preventDefault();
         }
 
-        leverBall.addEventListener('mousedown', onDragStart);
-        leverBall.addEventListener('touchstart', onDragStart, { passive: false });
+        leverWrapper.addEventListener('mousedown', onDragStart);
+        leverWrapper.addEventListener('touchstart', onDragStart, { passive: false });
+        leverWrapper.addEventListener('pointerdown', onDragStart, { passive: false });
         document.addEventListener('mousemove', onDragMove, { passive: false });
         document.addEventListener('touchmove', onDragMove, { passive: false });
+        document.addEventListener('pointermove', onDragMove, { passive: false });
         document.addEventListener('mouseup', onDragEnd);
         document.addEventListener('touchend', onDragEnd, { passive: false });
         document.addEventListener('touchcancel', onDragEnd, { passive: false });
+        document.addEventListener('pointerup', onDragEnd);
+        document.addEventListener('pointercancel', onDragEnd);
 
         function triggerLeverPull() {
             leverRod.style.transition = 'clip-path 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
