@@ -302,15 +302,33 @@
         #result-actions > .flex {
             gap: 10px !important;
         }
-        #result-actions button[onclick="openShare()"] {
-            padding: 14px 34px;
+        .result-share-btn {
             font-size: 0.95rem;
             line-height: 1;
         }
-        #instagram-share-btn {
-            padding: 11px 22px;
+        .result-instagram-btn {
             font-size: 0.72rem;
             line-height: 1;
+        }
+        .result-share-btn,
+        .result-instagram-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            width: min(100%, 460px);
+            min-height: 52px;
+            box-sizing: border-box;
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 0;
+        }
+        .result-share-btn {
+            padding: 14px 34px;
+        }
+        .result-instagram-btn {
+            padding: 11px 22px;
         }
 
         @media (min-width: 768px) {
@@ -469,12 +487,16 @@
                 width: 100%;
                 gap: 12px !important;
             }
-            #result-actions button[onclick="openShare()"] {
-                padding: 12px 24px;
+            .result-share-btn {
+                width: min(100%, 280px);
+                min-height: 50px;
+                padding: 12px 20px;
                 font-size: 0.78rem;
                 letter-spacing: 0.18em;
             }
-            #instagram-share-btn {
+            .result-instagram-btn {
+                width: min(100%, 280px);
+                min-height: 44px;
                 padding: 10px 16px;
                 font-size: 0.66rem;
                 letter-spacing: 0.18em;
@@ -571,10 +593,8 @@
                 </div>
             </div>
             <div class="flex flex-col items-center gap-3">
-               <button onclick="openShare()" class="px-8 py-4 bg-white text-black font-bold tracking-[0.2em] text-sm md:text-lg hover:bg-zinc-300 hover:scale-105 transition-all uppercase border-2 border-white">
-    Share Your Card
-</button>
-                <button id="instagram-share-btn" onclick="shareToInstagram()" class="px-6 py-3 bg-black text-white font-bold tracking-[0.2em] text-xs md:text-sm uppercase border border-zinc-600 hover:border-white hover:scale-105 transition-all">
+               <button onclick="openShare()" class="result-share-btn bg-white text-black font-bold tracking-[0.2em] text-sm md:text-lg hover:bg-zinc-300 hover:scale-105 transition-all uppercase border-2 border-white">Share Your Card</button>
+                <button id="instagram-share-btn" onclick="shareToInstagram()" class="result-instagram-btn bg-black text-white font-bold tracking-[0.2em] text-xs md:text-sm uppercase border border-zinc-600 hover:border-white hover:scale-105 transition-all">
                     Share to Instagram
                 </button>
             </div>
@@ -594,7 +614,7 @@
                     <p class="text-sm text-white tracking-widest">ADD INSTAGRAM MUSIC STICKER</p>
                 </div>
                 <div class="text-center text-xs text-zinc-600 space-y-4">
-                    <p id="share-modal-hint">Use share, or download the story card and post it in Instagram Stories adding Ground Zero.</p>
+                    <p id="share-modal-hint">On iPhone, use the share sheet to send the card to Instagram. If Instagram does not appear, download the card and add it to Stories manually.</p>
                     <button onclick="downloadStoryCard()" class="px-4 py-2 border border-zinc-700 text-white uppercase tracking-[0.08em] hover:border-white transition-all">Download story card</button>
                 </div>
             </div>
@@ -1163,6 +1183,25 @@
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
+
+        async function tryNativeFileShare(file, options = {}) {
+            if (!navigator.share || !navigator.canShare) return false;
+            try {
+                if (!navigator.canShare({ files: [file] })) return false;
+                await navigator.share({ files: [file], ...options });
+                return true;
+            } catch (error) {
+                if (error && error.name === 'AbortError') return true;
+                console.log('Native file share unavailable', error);
+                return false;
+            }
+        }
+
+        function openInstagramApp() {
+            const scheme = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'instagram://camera' : 'instagram://story-camera';
+            window.location.href = scheme;
+        }
+
         async function openShare() {
             const shareTitle = 'GROUND ZERO — NOANGELSS';
             const shareText = `I pulled GROUND ZERO CARD #${winningCard.id}. Add the song GROUND ZERO — NOANGELSS, BLACKAWASAKI in Instagram Music.`;
@@ -1170,10 +1209,8 @@
             try {
                 const storyBlob = await buildStoryBlob();
                 const storyFile = new File([storyBlob], `ground-zero-card-${winningCard.id}.png`, { type: 'image/png' });
-                if (navigator.canShare && navigator.canShare({ files: [storyFile] })) {
-                    await navigator.share({ title: shareTitle, text: shareText, files: [storyFile] });
-                    return;
-                }
+                const shared = await tryNativeFileShare(storyFile, { title: shareTitle, text: shareText });
+                if (shared) return;
                 if (navigator.share) {
                     await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
                     return;
@@ -1188,14 +1225,16 @@
             try {
                 const storyBlob = await buildStoryBlob();
                 const storyFile = new File([storyBlob], `ground-zero-card-${winningCard.id}.png`, { type: 'image/png' });
-                const shareText = `GROUND ZERO CARD #${winningCard.id} — add GROUND ZERO in Instagram Music.`;
-                if (navigator.canShare && navigator.canShare({ files: [storyFile] })) {
-                    await navigator.share({ files: [storyFile], title: 'Share to Instagram', text: shareText });
-                    return;
-                }
+                const shared = await tryNativeFileShare(storyFile, {
+                    title: 'Instagram Story',
+                    text: 'Open Instagram and choose Stories to post this card.'
+                });
+                if (shared) return;
+
                 await downloadStoryCard();
-                const scheme = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'instagram://camera' : 'instagram://story-camera';
-                window.location.href = scheme;
+                setTimeout(() => {
+                    openInstagramApp();
+                }, 250);
             } catch (error) {
                 console.log('Instagram share fallback', error);
                 showFallbackShareModal();
