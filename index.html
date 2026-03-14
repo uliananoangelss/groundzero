@@ -21,7 +21,7 @@
             padding: 0;
         }
         .bg-noise {
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+            background: #000;
         }
         .metal-body {
             background: linear-gradient(135deg, #2a2a2a 0%, #151515 40%, #0a0a0a 100%);
@@ -261,11 +261,39 @@
             margin-bottom: 0 !important;
         }
         #result-card-container {
-            width: clamp(190px, 24vw, 260px);
-            height: clamp(285px, 43vh, 390px);
-            max-width: 78vw;
-            max-height: 52dvh;
+            width: clamp(240px, 34vw, 430px);
+            aspect-ratio: 0.71 / 1;
+            max-width: 84vw;
+            max-height: 54dvh;
             margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+        }
+        #result-card-container > div {
+            width: 100%;
+            height: 100%;
+        }
+        .result-image-wrap {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            padding: clamp(12px, 2.5vh, 26px) 0;
+        }
+        .result-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center center;
+            display: block;
+            filter: drop-shadow(0 0 28px rgba(255,255,255,0.06));
         }
         #result-actions {
             margin-top: 0 !important;
@@ -283,6 +311,19 @@
             padding: 11px 22px;
             font-size: 0.72rem;
             line-height: 1;
+        }
+
+        @media (min-width: 768px) {
+            #result-stage {
+                gap: 22px;
+            }
+            #result-card-container {
+                max-height: 50dvh;
+                margin: 12px auto;
+            }
+            .result-image-wrap {
+                padding: clamp(18px, 3vh, 34px) 0;
+            }
         }
 
         @media (max-width: 767px) {
@@ -419,13 +460,10 @@
                 gap: 14px;
             }
             #result-card-container {
-                width: clamp(164px, 42vw, 216px) !important;
-                height: clamp(246px, 36vh, 324px) !important;
-                max-width: 58vw;
-                max-height: 40vh;
-            }
-            #result-card-container .card-image-frame {
-                padding: 6px !important;
+                width: clamp(248px, 72vw, 430px) !important;
+                aspect-ratio: 0.71 / 1;
+                max-width: 84vw;
+                max-height: 44vh;
             }
             #result-actions {
                 width: 100%;
@@ -611,9 +649,8 @@
 
         function getResultCardHTML(card) {
             return `
-                <div class="w-full h-full bg-[#0a0a0a] border-[8px] border-[#151515] p-3 md:p-4 relative overflow-hidden card-shadow">
-                    <div class="absolute inset-0 bg-noise opacity-40 z-0"></div>
-                    <div class="relative z-10 w-full h-full card-image-frame flex items-center justify-center p-2 md:p-3 overflow-hidden">
+                <div class="w-full h-full relative overflow-visible">
+                    <div class="result-image-wrap">
                         <img src="${card.image}" alt="GROUND ZERO CARD #${card.id}" class="card-image" loading="eager" draggable="false" />
                     </div>
                 </div>
@@ -815,15 +852,13 @@
             const mobile = viewportW < 768;
 
             const width = mobile
-                ? Math.max(164, Math.min(viewportW * 0.42, 216))
-                : Math.max(190, Math.min(viewportW * 0.24, 260));
-            const height = mobile
-                ? Math.max(246, Math.min(viewportH * 0.36, 324))
-                : Math.max(285, Math.min(viewportH * 0.43, 390));
+                ? Math.max(248, Math.min(viewportW * 0.72, 430))
+                : Math.max(240, Math.min(viewportW * 0.34, 430));
+            const height = Math.min(viewportH * (mobile ? 0.44 : 0.54), width / 0.71);
 
             cardContainer.style.width = `${Math.round(width)}px`;
             cardContainer.style.height = `${Math.round(height)}px`;
-            cardContainer.style.aspectRatio = '';
+            cardContainer.style.aspectRatio = '0.71 / 1';
         }
 
         function showResultScreen() {
