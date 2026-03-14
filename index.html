@@ -662,7 +662,7 @@
                     <p class="text-sm text-white tracking-widest">ADD INSTAGRAM MUSIC STICKER</p>
                 </div>
                 <div class="text-center text-xs text-zinc-600 space-y-4">
-                    <p id="share-modal-hint">Press and hold the image to save it to your phone, then open Instagram Stories and add the song “Ground Zero”.</p>
+                    <p id="share-modal-hint">Press and hold the image to save it to your phone, then open Instagram Stories and upload it there.</p>
                     <button onclick="openInstagramStories()" class="px-4 py-3 border border-zinc-700 text-white uppercase tracking-[0.08em] hover:border-white transition-all">Open Instagram Stories</button>
                 </div>
             </div>
@@ -680,7 +680,7 @@
             { id: 4, start: 54, image: 'GTRCARD4copy.png' },
             { id: 5, start: 75, image: 'GTRCARD5copy.png' },
             { id: 6, start: 63, image: 'GTRCARD6copy.png' },
-            { id: 7, start: 4, image: 'GTRCARD7copy.png' },
+            { id: 7, start: 63, image: 'GTRCARD7copy.png' },
             { id: 8, start: 78, image: 'GTRCARD8copy.png' },
             { id: 9, start: 104, image: 'GTRCARD9copy.png' },
             { id: 10, start: 81, image: 'GTRCARD10copy.png' }
@@ -1007,21 +1007,42 @@
         }
         window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 
+        
         function playWinningTrack() {
             if (!winningCard) return;
             pendingTrackStart = winningCard.start;
             if (!player || typeof player.loadVideoById !== 'function') return;
+
             const slider = document.getElementById('volume-slider');
             const volume = Number(slider?.value || 70);
             player.setVolume(volume);
             updateVolumeIcon(volume);
-            player.loadVideoById({ videoId: '-hO0nKWutBo', startSeconds: winningCard.start, suggestedQuality: 'small' });
-            player.playVideo();
-            isPlayerPlaying = true;
-            updatePlayPauseUI();
-            updateProgressSlider();
+
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.matchMedia('(pointer: coarse)').matches;
+
+            if (isMobile) {
+                // mobile: load the track but keep it paused so the user decides when to play
+                if (typeof player.cueVideoById === 'function') {
+                    player.cueVideoById({ videoId: '-hO0nKWutBo', startSeconds: winningCard.start, suggestedQuality: 'small' });
+                } else {
+                    player.loadVideoById({ videoId: '-hO0nKWutBo', startSeconds: winningCard.start, suggestedQuality: 'small' });
+                    player.pauseVideo();
+                }
+                isPlayerPlaying = false;
+                updatePlayPauseUI();
+                updateProgressSlider();
+            } else {
+                // desktop keeps autoplay
+                player.loadVideoById({ videoId: '-hO0nKWutBo', startSeconds: winningCard.start, suggestedQuality: 'small' });
+                player.playVideo();
+                isPlayerPlaying = true;
+                updatePlayPauseUI();
+                updateProgressSlider();
+            }
+
             pendingTrackStart = null;
         }
+
 
         function updatePlayPauseUI() {
             const playIcon = document.getElementById('play-icon');
