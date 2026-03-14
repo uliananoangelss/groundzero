@@ -259,6 +259,13 @@
             display: block;
             background: #000;
         }
+        #share-modal button[onclick="closeShare()"] {
+            top: max(6px, env(safe-area-inset-top));
+        }
+        #share-modal-hint {
+            line-height: 1.45;
+            color: #71717a;
+        }
 
         .volume-icon {
             width: 14px;
@@ -533,6 +540,21 @@
             #share-modal .max-w-\[400px\] {
                 max-width: min(92vw, 400px);
             }
+            #share-modal > div {
+                width: min(92vw, 400px);
+                height: min(78vh, 760px);
+                padding-top: 20px;
+            }
+            #share-modal button[onclick="closeShare()"] {
+                top: 2px;
+                right: 10px;
+            }
+            #story-card-preview {
+                width: 100%;
+            }
+            #share-modal-hint {
+                font-size: 0.85rem;
+            }
         }
         #youtube-player-host {
             position: fixed;
@@ -623,9 +645,6 @@
             </div>
             <div class="flex flex-col items-center gap-3">
                <button onclick="openShare()" class="result-share-btn bg-white text-black font-bold tracking-[0.2em] text-sm md:text-lg hover:bg-zinc-300 hover:scale-105 transition-all uppercase border-2 border-white">Share Your Card</button>
-                <button id="instagram-share-btn" onclick="shareToInstagram()" class="result-instagram-btn bg-black text-white font-bold tracking-[0.2em] text-xs md:text-sm uppercase border border-zinc-600 hover:border-white hover:scale-105 transition-all">
-                    Share to Instagram
-                </button>
             </div>
         </div>
         </div>
@@ -633,9 +652,9 @@
 
     <div id="share-modal" class="fixed inset-0 z-[60] bg-black/90 hidden flex-col items-center justify-center p-4">
         <div class="w-full max-w-[400px] h-[80vh] max-h-[800px] bg-[#111] border border-zinc-800 rounded-xl px-5 py-6 flex flex-col relative overflow-y-auto scrollbar-hide">
-            <button onclick="closeShare()" class="absolute top-4 right-4 text-zinc-500 hover:text-white text-xl p-2">×</button>
+            <button onclick="closeShare()" class="absolute top-1 right-4 text-zinc-500 hover:text-white text-xl p-2">×</button>
         
-            <div class="mt-6 flex flex-col gap-4">
+            <div class="mt-4 flex flex-col gap-4">
                 <div id="story-card-preview" class="story-card-preview-shell"></div>
                 <div class="text-center border border-zinc-800 px-6 py-5 bg-black">
                     <p class="font-bold text-white tracking-widest text-lg mb-1">GROUND ZERO</p>
@@ -643,8 +662,8 @@
                     <p class="text-sm text-white tracking-widest">ADD INSTAGRAM MUSIC STICKER</p>
                 </div>
                 <div class="text-center text-xs text-zinc-600 space-y-4">
-                    <p id="share-modal-hint">On iPhone, the share sheet is used first so you can save the card to Photos or send it to Instagram. If Instagram does not appear, save the image and add it to Stories manually.</p>
-                    <button onclick="downloadStoryCard()" class="px-4 py-2 border border-zinc-700 text-white uppercase tracking-[0.08em] hover:border-white transition-all">Download story card</button>
+                    <p id="share-modal-hint">Press and hold the image to save it to your phone, then open Instagram Stories and upload it there.</p>
+                    <button onclick="openInstagramStories()" class="px-4 py-3 border border-zinc-700 text-white uppercase tracking-[0.08em] hover:border-white transition-all">Open Instagram Stories</button>
                 </div>
             </div>
         </div>
@@ -1138,9 +1157,6 @@
         }
 
         function updateInstagramButtonVisibility() {
-            const btn = document.getElementById('instagram-share-btn');
-            if (!btn) return;
-            btn.style.display = isMobileDevice() ? 'inline-flex' : 'none';
         }
 
         async function loadCardImage(card) {
@@ -1268,42 +1284,23 @@
         }
 
         async function openShare() {
-            const shareTitle = 'GROUND ZERO — NOANGELSS';
-            const shareText = `I pulled GROUND ZERO CARD #${winningCard.id}. Add the song GROUND ZERO — NOANGELSS, BLACKAWASAKI in Instagram Music.`;
-            const shareUrl = window.location.href;
-            try {
-                const storyBlob = await buildStoryBlob();
-                const storyFile = new File([storyBlob], `ground-zero-card-${winningCard.id}.png`, { type: 'image/png' });
-                const shared = await tryNativeFileShare(storyFile, { title: shareTitle, text: shareText });
-                if (shared) return;
-                if (navigator.share) {
-                    await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
-                    return;
-                }
-            } catch (error) {
-                console.log('Native share unavailable', error);
-            }
             showFallbackShareModal();
         }
 
-        async function shareToInstagram() {
-            try {
-                const storyBlob = await buildStoryBlob();
-                const storyFile = new File([storyBlob], `ground-zero-card-${winningCard.id}.png`, { type: 'image/png' });
-                const shared = await tryNativeFileShare(storyFile, {
-                    title: 'Instagram Story',
-                    text: 'Open Instagram and choose Stories to post this card.'
-                });
-                if (shared) return;
-
-                await downloadStoryCard();
+        function openInstagramStories() {
+            const isInstagramApp = /Instagram/i.test(navigator.userAgent);
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.matchMedia('(pointer: coarse)').matches;
+            if (isMobile) {
+                const scheme = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'instagram://story-camera' : 'instagram://story-camera';
+                window.location.href = scheme;
                 setTimeout(() => {
-                    openInstagramApp();
-                }, 250);
-            } catch (error) {
-                console.log('Instagram share fallback', error);
-                showFallbackShareModal();
+                    if (!isInstagramApp) {
+                        window.location.href = 'https://www.instagram.com/';
+                    }
+                }, 900);
+                return;
             }
+            window.open('https://www.instagram.com/', '_blank');
         }
 
         window.addEventListener('DOMContentLoaded', () => {
